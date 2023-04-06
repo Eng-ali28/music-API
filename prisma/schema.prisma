@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id() @default(uuid())
+  username  String   @unique()
+  email     String   @unique()
+  password  String   @unique()
+  salt      String
+  role      Role
+  AUTH      Json
+  profile   Profile?
+  playlists PlayList[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Profile {
+  id        String   @id() @default(uuid())
+  firstName String
+  lastName  String
+  gender    Gender
+  age       Int
+  country   String
+  city      String
+  address   String
+  phone     String   @unique()
+  image     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique()
+  favorite Favorite?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+model EmailVerfication{
+  id String @id() @default(uuid())
+  email String @unique()
+  emailToken String
+  timeStamp DateTime @default(now())
+}
+model Singer {
+  id          String        @id() @default(uuid())
+  name        String
+  info        String
+  image       String?
+  type        Artist
+  gender      Gender
+  nationality String
+  album       SingerAlbum[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt()
+}
+
+model Musician {
+  id          String          @id() @default(uuid())
+  name        String
+  info        String
+  image       String?
+  type        Artist
+  gender      Gender
+  nationality String
+  album       MusicianAlbum[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt()
+}
+
+model SingerAlbum {
+  id        String   @id() @default(uuid())
+  name      String @unique()
+  image     String
+  singer    Singer   @relation(fields: [singerId], references: [id])
+  singerId  String
+  song      Song[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model MusicianAlbum {
+  id         String   @id() @default(uuid())
+  name       String   @unique()
+  image      String
+  musician   Musician @relation(fields: [musicianId], references: [id])
+  musicianId String
+  music     Music[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Song {
+  id            String       @id() @default(uuid())
+  name          String       @unique()
+  description   String
+  artist        Artist
+  type          SongType
+  language      LanguageType
+  rate          Float
+  source        String       
+  tempImg       String?
+  artistAlbum   SingerAlbum?  @relation(fields: [artistAlbumId], references: [id])
+  artistAlbumId String?
+  tracks Track[]
+  publishedIn   DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt()
+}
+
+model Music {
+  id           String        @id() @default(uuid())
+  name         String        @unique()
+  description  String
+  artist       Artist
+  type         MusicType
+  city         String
+  source       String        @unique()
+  tempImg    String
+  musicAlbum   MusicianAlbum? @relation(fields: [musicAlbumId], references: [id])
+  musicAlbumId String?
+  tracks Track[]
+  publishedIn  DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt()
+}
+model Favorite {
+  id String @id() @default(uuid())
+  profile Profile @relation(fields: [profileId], references: [id])
+  profileId String @unique()
+  tracks Track[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+model PlayList { 
+  id String @id() @default(uuid())
+  name String @unique()
+  user User @relation(fields:[userId] , references: [id])
+  userId String
+  tracks Track[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+// Track model is joker model 
+// the third table between song and playlist and between music and play list and song between song and favorite and between music and favorite.
+model Track {
+  id String @id() @default(uuid())
+  title String @unique()
+  index Int @default(autoincrement())
+   link String
+   favorite Favorite? @relation(fields:[favoriteId] , references: [id])
+   favoriteId String
+   song Song? @relation(fields:[songId] , references: [id])
+   songId String
+   music Music? @relation(fields:[musicId] , references: [id])
+   musicId String
+   playList PlayList? @relation(fields:[playListId] , references: [id])
+   playListId String
+}
+enum MusicType {
+  PIANO
+  KEYBOARD
+  RECORDER
+  CLASSICAL_GUITAR
+  DRUM
+  ELECTRIC_GUITAR
+  VIOLIN
+  BASS_GUITAR
+  SAXOPHONE
+  FLUTE
+  CELLO
+  CLARINET
+  TRUMPET
+  HARP
+  MIX
+}
+
+enum SongType {
+  CLASSICAL
+  POP
+  ROCK
+  METAL
+  COUNTRY
+  HIP_HOP
+  BALLADS
+  DANCE
+  LOVE
+  GOSPEL
+}
+
+enum LanguageType {
+  ENGLISH
+  ARABIC
+  FRANCE
+  TURKISH
+  SPANISH
+  ITALIC
+  LATINA
+}
+
+enum Role {
+  ADMIN
+  USER
+  Owner
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Artist {
+  Single
+  Music_Band
+}
