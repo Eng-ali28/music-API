@@ -10,8 +10,7 @@ import appConfig from 'src/config/app.config';
       // transport: 'smtps://user@example.com:topsecret@smtp.example.com',
       // or
       transport: {
-        host: appConfig().mailHost,
-        secure: true,
+        service: appConfig().mailHost,
         auth: {
           user: appConfig().mailUser,
           pass: appConfig().mailPassword,

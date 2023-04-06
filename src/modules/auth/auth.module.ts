@@ -8,6 +8,7 @@ import AuthController from './auth.controller';
 import PrismaModule from 'prisma/prisma.module';
 import UserModule from '../user/user.module';
 import MailModule from 'src/shared/mail/mail.module';
+import { JwtGuard } from './guards/jwt.guard';
 
 @Module({
   imports: [

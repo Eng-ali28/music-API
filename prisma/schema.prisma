@@ -33,7 +33,7 @@ model Profile {
   city      String
   address   String
   phone     String   @unique()
-  image     String
+  image     String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @unique()
   favorite Favorite?
@@ -44,6 +44,12 @@ model EmailVerfication{
   id String @id() @default(uuid())
   email String @unique()
   emailToken String
+  timeStamp DateTime @default(now())
+}
+model ForgottenPassword{
+  id String @id() @default(uuid())
+  email String @unique()
+  token String @unique()
   timeStamp DateTime @default(now())
 }
 model Singer {
@@ -128,7 +134,7 @@ model Music {
 }
 model Favorite {
   id String @id() @default(uuid())
-  profile Profile @relation(fields: [profileId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id] , onDelete: Cascade)
   profileId String @unique()
   tracks Track[]
   createdAt DateTime @default(now())
